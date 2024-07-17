@@ -1,16 +1,30 @@
 /*
-First time? Check out the tutorial game:
-https://sprig.hackclub.com/gallery/getting_started
+GOALS:
+[✔]LOWER HITBOX
+[✔]ADD MENU
+[✔]MAKE NOTES DISAPPEAR WHEN HIT
+[✔]ADD SCORE
+[]ADD DIFFICULTY/SPEED
+
+[]ALLOW WRITING CUSTOM SONGS  (pass array of ints 0-5/1-6 to var)
+
+MAYBES:
+[]ALLOW SONGS TO END AND RETURN TO MENU
+[]MAKE MENU OF SONGS TO CHOOSE FROM
+[]INCREASE POLLING RATE (make it more responsive to keyboard press)
+[]ALLOW CUSTOM SONGS TO PLAY CUSTOM MEDLEYS
+[]
 
 @title: Rythym-Mania
-@author: 
-@tags: []aa
-@addedOn: 2024-00-00
+@author: sosenteam
+@tags: ["rythym-game"]
+@addedOn: 2024-7-16
 */
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+let gameMode = "startScreen";
+//DONT CHANGE
+let screen = 0; // 0 = Menu
+let score = 0; 
+let isDefaultColor = true;
 const note = "n"
 //
 // Constructor function for Person objects
@@ -202,6 +216,20 @@ setSolids([])
 
 const levels = [
   map`
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy
+zabcdefy`,
+  map`
 z......y
 z......y
 z......y
@@ -216,8 +244,8 @@ z......y
 zabcdefy
 z......y`
 ]
-setMap(levels[0])
-// console.log(getAll(key[0].s));
+setMap(levels[screen]);
+//KEYBINDINGS
 for (let i = 0; i < key.length; i++) {
   const currentKey = key[i];
 
@@ -229,34 +257,104 @@ for (let i = 0; i < key.length; i++) {
     }, 100);
   });
 }
-setInterval(() => {
-  addSprite(getRandomInt(1, width() - 1), 0, note);
-}, 500);
-// Game loop
-// Game loop
-let gameLoop = setInterval(() => {
-  let currentNotes = getAll(note);
-  currentNotes.forEach((item) => {
-    if (item.y >= height() - 1) {
-      item.remove();
-    }
-    item.y += 1;
-  });
-  for (let i = 0; i < key.length; i++) {
-    let currentKeys = getAll(key[i].s);
-    if (key[i].keyDown) {
-      currentKeys.forEach((item) => {
-        let checkTile = (x, y) => {
-          return getTile(x, y).some(obj => obj._type === "n") || getTile(x, y - 1).some(obj => obj._type === "n") || getTile(x, y - 2).some(obj => obj._type === "n");
-        };
-        if (checkTile(item.x, item.y)) {
-          playTune(key[i].melody);
-        }
-      });
-    }
-  }
-}, 100);
+//
 
+//MENU
+if (screen == 0) {
+  addText("Rythym", {
+    x: 7,
+    y: 4,
+    color: color`0`
+  })
+  addText("Mania", {
+    x: 8,
+    y: 6,
+    color: color`0`
+  })
+  let textFlash = setInterval(() => {
+    if(screen == 0){
+    const currentColor = isDefaultColor ? color`0` : color`2`;
+    addText("Press", {
+      x: 7,
+      y: 12,
+      color: currentColor
+    })
+    addText("A", {
+      x: 10,
+      y: 14,
+      color: currentColor
+    })
+    isDefaultColor = !isDefaultColor;
+    }
+  }, 500);
+  let menuTimer = setInterval(() => {
+    if (key[0].keyDown) {
+      screen = 1;
+      clearText();
+      clearInterval(menuTimer);
+      clearInterval(textFlash);
+      startGameloop();
+      
+      setMap(levels[screen]);
+      gameMode = "random"
+      setGamemodeRandom()
+
+    }
+  }, 100)
+}
+
+
+
+function setGamemodeRandom() {
+  if (gameMode == "random") {
+    setInterval(() => {
+      addSprite(getRandomInt(1, width() - 1), 0, note);
+    }, 500);
+  }
+}
+
+function startGameloop() {
+  //console.log("Game loop started");
+  // Game loop
+  let gameLoop = setInterval(() => {
+    //SCORE
+    clearText();
+    addText(score.toString(), {
+      x: 9,
+      y: 0,
+      color: color`0`
+    })
+    //
+    let currentNotes = getAll(note);
+    currentNotes.forEach((item) => {
+      if (item.y >= height() - 1) {
+        item.remove();
+        score = 0;
+      }
+      item.y += 1;
+    });
+    for (let i = 0; i < key.length; i++) {
+      let currentKeys = getAll(key[i].s);
+      if (key[i].keyDown) {
+        currentKeys.forEach((keyItem) => {
+          let checkTile = (x, y) => {
+            return getTile(x, y).some(obj => obj._type === "n") || getTile(x, y - 1).some(obj => obj._type === "n")
+          };
+          if (checkTile(keyItem.x, keyItem.y)) {
+            //
+            playTune(key[i].melody);
+            score++;
+            currentNotes.forEach((item) => {
+              if (item.y >= keyItem.y - 2 && item.x == keyItem.x) {
+                item.remove();
+              }
+            });
+          }
+        });
+      }
+    }
+  }, 100);
+}
 
 
 //
@@ -265,4 +363,8 @@ function getRandomInt(min, max) {
   const minCeiled = Math.ceil(min);
   const maxFloored = Math.floor(max);
   return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
