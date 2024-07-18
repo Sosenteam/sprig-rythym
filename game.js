@@ -6,7 +6,7 @@ GOALS:
 [✔]ADD SCORE
 []ADD DIFFICULTY/SPEED
 [✔]ALLOW WRITING CUSTOM SONGS  (pass array of ints 0-5/1-6 to var)
-[]ALLOW MULTIPLE NOTES AT ONCE
+[✔]ALLOW MULTIPLE NOTES AT ONCE
 [✔]CHANGE GAMELOOP TO 50 OR 25 MS BUT KEEP FALL SPEED (or allow it to change)
 
 MAYBES:
@@ -22,7 +22,57 @@ MAYBES:
 @addedOn: 2024-7-16
 */
 let gameModeDEV = "song"; //random, song 
-let song = { list: [0, 2, 4,[0, 2, 4] , 1, 3, 5, [1, 3, 5]], delay: 400, }
+const themeLevels = {
+  scales: [0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, [0, 2],
+    [1, 3],
+    [2, 4],
+    [3, 5],
+    [4, 2],
+    [3, 1],
+    [2, 0],
+    [1, 3]
+  ],
+  chords: [
+    [0, 2, 4], 1, [1, 3, 5], 2, [0, 3, 5], 3, [1, 4, 2], 4, [0, 2, 5],
+    [1, 3, 5],
+    [0, 3, 5],
+    [2, 4, 1],
+    [0, 2, 4], 1, [1, 3, 5], 2
+  ],
+  jumps: [0, 5, 1, 4, 2, 5, 0, 3, [0, 5], 2, [1, 4], 3, [2, 5], 1, [0, 4], 5, 0, 5, [1, 4], 2, 5, [0, 3], 1, [2, 5]],
+  zigs: [0, 5, 1, 4, 2, 5, 0, 3, [0, 5],
+    [1, 4],
+    [2, 5],
+    [0, 3], 0, 5, 1, 4, 2, 3, 1, 5, [0, 5],
+    [1, 4],
+    [2, 3],
+    [0, 5]
+  ],
+  egg: [2, 1, [0, 3],
+    [0, 3], 2, 1, [0, 4],
+    [0, 4], 2, 1, [0, 5],
+    [0, 5],
+    [1, 2],
+    [0, 3],
+    [0, 3],
+    [1, 2], 2, 1, [0, 4],
+    [0, 4], 2, 1
+  ],
+  jam: [
+    [0, 2], 3, [1, 4], 2, [0, 3], 1, [2, 5], 3, [0, 2, 4], 1, 3, [1, 3], 2, [0, 4], 1, [2, 3], 0, [1, 3], 2, [0, 4],
+    [1, 5], 2, [0, 2, 4], 1, [0, 3],
+    [1, 4],
+    [0, 2], 5, [1, 3],
+    [0, 4],
+    [2, 5],
+    [0, 1, 4]
+  ]
+};
+
+let song = {
+  list: themeLevels.chords,
+  delay: 400,
+}
 //DONT CHANGE
 let screen = 0; // 0 = Menu
 let score = 0;
@@ -221,19 +271,59 @@ setSolids([])
 
 const levels = [
   map`
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy
-zabcdefy`,
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy
+zaaaaabbbbbcccccdddddeeeeefffffy`,
+  map`
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aa............................aa
+aa............................aa
+aabbbbbbbbbbbbbbbbbbbbbbbbbbbbaa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aabbbbbbbbbbbbbbbbbbbbbbbbbbbbaa
+aabbbbbbbbbbbbbbbbbbbbbbbbbbbbaa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aabbbbbbbbbbbbbbbbbbbbbbbbbbbbaa
+aabbbbbbbbbbbbbbbbbbbbbbbbbbbbaa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aab.............b............baa
+aabbbbbbbbbbbbbbbbbbbbbbbbbbbbaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`,
   map`
 z......y
 z......y
@@ -267,26 +357,31 @@ for (let i = 0; i < key.length; i++) {
 //MENU
 if (screen == 0) {
   addText("Rythym", {
-    x: 7,
+    x: 4,
     y: 4,
     color: color`0`
   })
   addText("Mania", {
-    x: 8,
-    y: 6,
+    x: 11,
+    y: 4,
     color: color`0`
   })
   let textFlash = setInterval(() => {
     if (screen == 0) {
-      const currentColor = isDefaultColor ? color`0` : color`2`;
-      addText("Press", {
-        x: 7,
+      const currentColor = isDefaultColor ? color`0` : color`L`;
+      addText("Press J for Level", {
+        x: 2,
+        y: 10,
+        color: currentColor
+      })
+      addText("Press   to Start", {
+        x: 2,
         y: 12,
         color: currentColor
       })
       addText("A", {
-        x: 10,
-        y: 14,
+        x: 8,
+        y: 12,
         color: currentColor
       })
       isDefaultColor = !isDefaultColor;
@@ -294,22 +389,71 @@ if (screen == 0) {
   }, 500);
   let menuTimer = setInterval(() => {
     if (key[0].keyDown) {
-      screen = 1;
+      screen = 2;
       clearText();
       clearInterval(menuTimer);
       clearInterval(textFlash);
       startGameloop();
 
       setMap(levels[screen]);
-      gameMode = gameModeDEV;
-      if (gameModeDEV == "random") setGamemodeRandom();
-      if (gameModeDEV == "song") startSong();
-
+      gameMode = "random";
+      setGamemodeRandom();
+    }
+    if (key[3].keyDown) {
+      screen = 1;
+      clearText();
+      clearInterval(menuTimer);
+      clearInterval(textFlash);
+      setMap(levels[screen]);
+      levelSelect();
     }
   }, 100)
 }
 
 
+function levelSelect() {
+  addText("Level Select", {
+    x: 4,
+    y: 1,
+    color: color`0`
+  })
+
+  addText("A.Scales", {
+    x: 2,
+    y: 3
+  })
+  addText("S.Chords", {
+    x: 2,
+    y: 8
+  })
+  addText("D.Jumps", {
+    x: 2,
+    y: 12
+  })
+  addText("J.Zigs", {
+    x: 11,
+    y: 3
+  })
+  addText("K.Egg", {
+    x: 11,
+    y: 8
+  })
+  addText("L.Jam", {
+    x: 11,
+    y: 12
+  })
+  let levelTimer = setInterval(() => {
+    if (key[0].keyDown) {
+      screen = 2;
+      clearText();
+      clearInterval(levelTimer);
+      startGameloop();
+      setMap(levels[screen]);
+      gameMode = song;
+      if (gameModeDEV == "song") startSong();
+    }
+  }, 100);
+}
 
 function setGamemodeRandom() {
   if (gameMode == "random") {
@@ -340,7 +484,7 @@ function startGameloop() {
   let gameLoop = setInterval(() => {
     //START FALL TICK
     fallTick++;
-    if (fallTick >= 4) {
+    if (fallTick >= 10) {
       fallTick = 0;
     }
     //SCORE
@@ -381,7 +525,7 @@ function startGameloop() {
         });
       }
     }
-  }, 25);
+  }, 10);
 }
 
 
