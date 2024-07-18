@@ -1,25 +1,30 @@
 /*
+@title: Rythym-Mania
+@author: sosenteam
+@tags: ["rythym-game","fun"]
+@addedOn: 2024-7-16
+
+GOAL: HIT THE CORRECT KEY WHEN THE NOTES FALL ONTO THE BLOCKS
+KEYS:
+ASD JKL - KEYS TO ACTIVATE BLOCKS 
+
+
 GOALS:
 [✔]LOWER HITBOX
 [✔]ADD MENU
 [✔]MAKE NOTES DISAPPEAR WHEN HIT
 [✔]ADD SCORE
-[]ADD DIFFICULTY/SPEED
 [✔]ALLOW WRITING CUSTOM SONGS  (pass array of ints 0-5/1-6 to var)
 [✔]ALLOW MULTIPLE NOTES AT ONCE
 [✔]CHANGE GAMELOOP TO 50 OR 25 MS BUT KEEP FALL SPEED (or allow it to change)
 
 MAYBES:
+[]ADD DIFFICULTY/SPEED
 []ALLOW SONGS TO END AND RETURN TO MENU
-[]MAKE MENU OF SONGS TO CHOOSE FROM
-[]
+[✔]MAKE MENU OF SONGS TO CHOOSE FROM
 []ALLOW CUSTOM SONGS TO PLAY CUSTOM MEDLEYS
-[]
 
-@title: Rythym-Mania
-@author: sosenteam
-@tags: ["rythym-game"]
-@addedOn: 2024-7-16
+
 */
 let gameModeDEV = "song"; //random, song 
 const themeLevels = {
@@ -70,7 +75,7 @@ const themeLevels = {
 };
 
 let song = {
-  list: themeLevels.chords,
+  list: themeLevels.scales,
   delay: 400,
 }
 //DONT CHANGE
@@ -352,7 +357,6 @@ for (let i = 0; i < key.length; i++) {
     }, 100);
   });
 }
-//
 
 //MENU
 if (screen == 0) {
@@ -443,7 +447,14 @@ function levelSelect() {
     y: 12
   })
   let levelTimer = setInterval(() => {
-    if (key[0].keyDown) {
+    if(key[0].keyDown)song.list = themeLevels.scales;
+    if(key[1].keyDown)song.list = themeLevels.chords;
+    if(key[2].keyDown)song.list = themeLevels.jumps;
+    if(key[3].keyDown)song.list = themeLevels.zigs;
+    if(key[4].keyDown)song.list = themeLevels.egg;
+    if(key[5].keyDown)song.list = themeLevels.jam;
+    
+    if (key.some(keys => keys.keyDown)) {
       screen = 2;
       clearText();
       clearInterval(levelTimer);
