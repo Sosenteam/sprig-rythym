@@ -5,13 +5,14 @@ GOALS:
 [✔]MAKE NOTES DISAPPEAR WHEN HIT
 [✔]ADD SCORE
 []ADD DIFFICULTY/SPEED
-
-[]ALLOW WRITING CUSTOM SONGS  (pass array of ints 0-5/1-6 to var)
+[✔]ALLOW WRITING CUSTOM SONGS  (pass array of ints 0-5/1-6 to var)
+[]ALLOW MULTIPLE NOTES AT ONCE
+[✔]CHANGE GAMELOOP TO 50 OR 25 MS BUT KEEP FALL SPEED (or allow it to change)
 
 MAYBES:
 []ALLOW SONGS TO END AND RETURN TO MENU
 []MAKE MENU OF SONGS TO CHOOSE FROM
-[]INCREASE POLLING RATE (make it more responsive to keyboard press)
+[]
 []ALLOW CUSTOM SONGS TO PLAY CUSTOM MEDLEYS
 []
 
@@ -20,11 +21,15 @@ MAYBES:
 @tags: ["rythym-game"]
 @addedOn: 2024-7-16
 */
-let gameMode = "startScreen";
+let gameModeDEV = "song"; //random, song 
+let song = { list: [0, 2, 4,[0, 2, 4] , 1, 3, 5, [1, 3, 5]], delay: 400, }
 //DONT CHANGE
 let screen = 0; // 0 = Menu
-let score = 0; 
+let score = 0;
 let isDefaultColor = true;
+let songPosition = 0;
+let gameMode = "startScreen";
+let fallTick = 0;
 const note = "n"
 //
 // Constructor function for Person objects
@@ -272,19 +277,19 @@ if (screen == 0) {
     color: color`0`
   })
   let textFlash = setInterval(() => {
-    if(screen == 0){
-    const currentColor = isDefaultColor ? color`0` : color`2`;
-    addText("Press", {
-      x: 7,
-      y: 12,
-      color: currentColor
-    })
-    addText("A", {
-      x: 10,
-      y: 14,
-      color: currentColor
-    })
-    isDefaultColor = !isDefaultColor;
+    if (screen == 0) {
+      const currentColor = isDefaultColor ? color`0` : color`2`;
+      addText("Press", {
+        x: 7,
+        y: 12,
+        color: currentColor
+      })
+      addText("A", {
+        x: 10,
+        y: 14,
+        color: currentColor
+      })
+      isDefaultColor = !isDefaultColor;
     }
   }, 500);
   let menuTimer = setInterval(() => {
@@ -294,10 +299,11 @@ if (screen == 0) {
       clearInterval(menuTimer);
       clearInterval(textFlash);
       startGameloop();
-      
+
       setMap(levels[screen]);
-      gameMode = "random"
-      setGamemodeRandom()
+      gameMode = gameModeDEV;
+      if (gameModeDEV == "random") setGamemodeRandom();
+      if (gameModeDEV == "song") startSong();
 
     }
   }, 100)
@@ -313,10 +319,30 @@ function setGamemodeRandom() {
   }
 }
 
+function startSong() {
+  setInterval(() => {
+    if (songPosition >= song.list.length) songPosition = 0;
+    if (Array.isArray(song.list[songPosition])) {
+      song.list[songPosition].forEach((item) => {
+        addSprite(item + 1, 0, note);
+
+      });
+    } else {
+      addSprite(song.list[songPosition] + 1, 0, note);
+    }
+    songPosition++;
+  }, song.delay);
+}
+
 function startGameloop() {
   //console.log("Game loop started");
   // Game loop
   let gameLoop = setInterval(() => {
+    //START FALL TICK
+    fallTick++;
+    if (fallTick >= 4) {
+      fallTick = 0;
+    }
     //SCORE
     clearText();
     addText(score.toString(), {
@@ -331,7 +357,9 @@ function startGameloop() {
         item.remove();
         score = 0;
       }
-      item.y += 1;
+      if (fallTick == 0) {
+        item.y += 1;
+      }
     });
     for (let i = 0; i < key.length; i++) {
       let currentKeys = getAll(key[i].s);
@@ -353,7 +381,7 @@ function startGameloop() {
         });
       }
     }
-  }, 100);
+  }, 25);
 }
 
 
